@@ -201,6 +201,16 @@ sub getSmartctl{
 			$twDevice =~ s/,//;
 			$device = '/dev/'.$twDevice;
 		}
+		# Check if Areca format is used
+		elsif($device =~ /^(areca),([0-9])+\/([0-9]+),(\/dev\/sg[0-9]+)$/){
+			my $arecaDevice = $1 . "," . $2 . "," . $3;
+			my $devicePath = $4;
+			# Call smartctl
+			@output = `$smartctl -a -d $arecaDevice $devicePath`;
+			# From now on we use only e.g. areca1/1 as device
+			$arecaDevice =~ s/,//;
+			$device = '/dev/'.$arecaDevice;
+		}
 		else{
 			# If the device is a symlink, simply follow it
 			if(-l $device){
